@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+eec() { zenity --error --text="$1"; exit 1; }
+
+wpfile=$(zenity --file-selection --filename="$HOME/Pictures/Wallpapers/")
+
+[ -z $wpfile ] && eec "No file selected."
+[ -d $wpfile ] && eec "Selected file was a directory."
+
+method=$(zenity --list --radiolist --hide-header \
+    --column=tick --column=method \
+    TRUE tile FALSE fill FALSE center FALSE max FALSE scale)
+
+[ -z $method ] && eec "No scaling method selected."
+
+feh "--bg-$method" $wpfile
