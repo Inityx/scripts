@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+kernel="linux"
+timeout=5000
+max_list=8
+
+updates=$(checkupdates | cut -d' ' -f1)
+count=$(echo "$updates" | wc -l)
+
+if [ $count -eq 0 ]; then
+    exit 0
+fi
+
+if [ $count -gt $max_list ]; then
+    body="$count packages"
+    if [[ $updates =~ $kernel ]]; then
+        body+=",\nincluding kernel"
+    fi
+else
+    body=$updates
+fi
+
+notify-send "Updates Available" "$body" -t $timeout
