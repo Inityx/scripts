@@ -3,7 +3,6 @@
 set -e
 
 kernel="linux"
-timeout=5000
 max_list=8
 
 updates=$(checkupdates | cut -d' ' -f1)
@@ -22,4 +21,4 @@ else
     body=$updates
 fi
 
-notify-send "Updates Available" "$body" -t $timeout
+notify-send "Updates Available" "$body"
