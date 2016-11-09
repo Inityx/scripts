@@ -2,10 +2,22 @@
 
 set -e
 
+is_installed() {
+    which $1 &>/dev/null
+    return $?
+}
+
 kernel="linux"
 max_list=8
 
-updates=$(checkupdates | cut -d' ' -f1)
+if is_installed apt-get; then
+    updates=$(apt-get -s dist-upgrade | awk '/^Inst/ { print $2 }')
+elif is_installed pacman; then
+    updates=$(checkupdates | cut -d' ' -f1)
+else
+    exit 0
+fi
+
 count=$(echo "$updates" | wc -l)
 
 if [ $count -eq 0 ]; then
