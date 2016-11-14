@@ -1,0 +1,58 @@
+#!/bin/bash
+
+errecho() { echo $@ 1>&2; }
+
+usage() {
+    errecho "Usage: $0 [--exec CALLBACK] SOURCE..."
+    exit 0
+}
+
+_aggregate() {
+    errecho "Enumerating files..."
+    files="$(find ${@:2} -type f)"
+    width=$(echo $files | wc -l | wc -c)
+    
+    errecho "Creating symlinks..."
+    i=0
+    IFS=$'\n'
+    for file in $files; do
+        i=$((i+1))
+        canonsrc=$(readlink -f "$file")
+        number=$(printf "%0$((width-1))d" $i)
+        basename=$(basename "$file")
+        
+        ln -s "$canonsrc" "$1/$number-$basename"
+    done
+}
+
+_deaggregate() {
+    errecho "Cleaning up..."
+    for symlink in "$1"/*; do
+        unlink "$symlink"
+    done
+    rmdir "$1"
+    errecho "Done."
+}
+   
+if  [ "$#" -eq "0" ] || { [ "$1" == "--exec" ] && [ "$#" -lt "3" ]; }; then
+    usage
+fi
+
+tmpdir=$(mktemp -d)
+
+if [ "$1" == "--exec" ]; then
+    errecho "Using callback \"$2\"."
+    callback=$2
+    sources=${@:3}
+else
+    sources=$@
+fi
+ 
+_aggregate $tmpdir $sources
+
+if [ -n "$callback" ]; then
+    $callback $tmpdir
+    _deaggregate $tmpdir
+else
+    echo $tmpdir
+fi
