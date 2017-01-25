@@ -1,6 +1,6 @@
 #!/bin/bash
 
-errecho() { echo $@ 1>&2; }
+errecho() { echo "$@" 1>&2; }
 
 usage() {
     errecho "Usage: $0 [--exec CALLBACK] SOURCE..."
@@ -9,8 +9,8 @@ usage() {
 
 _aggregate() {
     errecho "Enumerating files..."
-    files="$(find ${@:2} -type f)"
-    width=$(echo $files | wc -l | wc -c)
+    files="$(find "${@:2}" -type f)"
+    width=$(echo "$files" | wc -l | wc -c)
     
     errecho "Creating symlinks..."
     i=0
@@ -43,16 +43,16 @@ tmpdir=$(mktemp -d)
 if [ "$1" == "--exec" ]; then
     errecho "Using callback \"$2\"."
     callback=$2
-    sources=${@:3}
+    sources=(${@:3})
 else
-    sources=$@
+    sources=($@)
 fi
  
-_aggregate $tmpdir $sources
+_aggregate "$tmpdir" "${sources[@]}"
 
 if [ -n "$callback" ]; then
-    $callback $tmpdir
-    _deaggregate $tmpdir
+    $callback "$tmpdir"
+    _deaggregate "$tmpdir"
 else
-    echo $tmpdir
+    echo "$tmpdir"
 fi
