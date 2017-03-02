@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [ "$(pactl list sinks | egrep -o '[0-9]+%' | head -n1 | tr -d '%')" -lt 100 ]; then
+    pactl set-sink-volume "$1" "$2";
+fi
