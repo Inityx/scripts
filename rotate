@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+abort 'Usage: rotate string [string, ...]' if ARGV.empty?
+
+ARGV.map(&:chars).map do |word|
+  word << ' ' if word.include?(' ')
+  word.length.times do
+    puts word.join(' ')
+    word.rotate!
+  end
+  puts
+end
