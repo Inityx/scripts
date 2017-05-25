@@ -1,0 +1,7 @@
+#!/bin/bash
+
+orphans=$(pacman -Qtdq)
+
+[ -z "$orphans" ] && echo "No orphan packages found." && exit
+
+echo "$orphans" | xargs sudo pacman -Rns 
